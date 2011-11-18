@@ -41,6 +41,7 @@
 @property (readwrite) NSTimeInterval trackPosition;
 
 -(void)informDelegateOfAudioPlaybackStarting;
+-(void)informDelegateOfAudioPlaybackStopping;
 
 // Core Audio
 -(BOOL)setupCoreAudioWithAudioFormat:(const sp_audioformat *)audioFormat error:(NSError **)err;
@@ -197,7 +198,8 @@ static NSUInteger const kUpdateTrackPositionHz = 5;
 }
 
 -(void)sessionDidEndPlaybackOnMainThread:(SPSession *)aSession {
-	self.currentTrack = nil;	
+	self.currentTrack = nil;
+    [self informDelegateOfAudioPlaybackStopping];
 }
 
 #pragma mark -
@@ -439,8 +441,22 @@ static inline void fillWithError(NSError **mayBeAnError, NSString *localizedDesc
 		[self performSelectorOnMainThread:_cmd withObject:nil waitUntilDone:NO];
 		return;
 	}
-	[self.delegate playbackManagerWillStartPlayingAudio:self];
+    if ([self.delegate respondsToSelector:@selector(playbackManagerWillStartPlayingAudio:)]) {
+     	[self.delegate playbackManagerWillStartPlayingAudio:self];   
+    }
 }
+
+-(void)informDelegateOfAudioPlaybackStopping {
+	if (![NSThread isMainThread]) {
+		[self performSelectorOnMainThread:_cmd withObject:nil waitUntilDone:NO];
+		return;
+	}
+    if ([self.delegate respondsToSelector:@selector(playbackManagerWillStopPlayingAudio:)]) {
+     	[self.delegate playbackManagerWillStopPlayingAudio:self];   
+    }
+}
+
+
 
 #pragma mark -
 #pragma mark Core Audio Render Callback

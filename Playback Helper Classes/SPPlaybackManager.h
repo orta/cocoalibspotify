@@ -49,6 +49,7 @@
 
 /** Called when audio starts playing. */
 -(void)playbackManagerWillStartPlayingAudio:(SPPlaybackManager *)aPlaybackManager;
+-(void)playbackManagerWillStopPlayingAudio:(SPPlaybackManager *)aPlaybackManager;
 
 @end
 
