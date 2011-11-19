@@ -93,7 +93,8 @@ static NSUInteger const kUpdateTrackPositionHz = 5;
 -(void)dealloc {
 	
 	[self removeObserver:self forKeyPath:@"playbackSession.playing"];
-	
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+
 	self.playbackSession.playbackDelegate = nil;
 	self.playbackSession = nil;
 	self.currentTrack = nil;
@@ -280,7 +281,8 @@ static inline void fillWithError(NSError **mayBeAnError, NSString *localizedDesc
 	BOOL success = YES;
 	success &= [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
 	success &= [[AVAudioSession sharedInstance] setActive:YES error:&error];
-	
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    
 	if (!success && err != NULL) {
 		*err = error;
 		return NO;
